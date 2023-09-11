@@ -1,0 +1,75 @@
+=How to install MediaWiki onto an AWS EC2 instance=
+
+==Set up the LAMP stack==
+I used a LAMP (Linux/Apache/MariaDB/PHP) stack in this guide.
+The AWS EC2 instance wizard allows you to select Debian Linux as your operating system.
+
+When I created the EC2 instance, I also created a private ssh key specifically for the instance.
+I like to set up folders in my Documents directory for each website, so this one I named AWSJackogdoches.
+I had to set the key's permission using the following command:
+
+> chmod 600 "key name".pem
+
+Otherwise, the EC2 instance will deny your shell connection.
+This sets the key to only be read/writeable by you.
+Once the permission is set, you can begin accessing the EC2 instance with the ssh command:
+
+> ssh -i "key name".pem "username"@"ec2 IPv4 DNS"
+
+Now we need to install Apache2, MariaDB, and PHP. MediaWiki has a bunch of other dependencies,
+but for now we just want to install the LAMP stack itself.
+First it is a good idea to run a general software update:
+
+> sudo apt update
+> sudo apt upgrade
+
+===Apache2===
+Once that is done, install Apache2:
+
+> sudo apt install -y apache2 apache2-utils
+
+Then, allow Apache2 to automatically start at the same time as the system:
+
+> sudo systemctl enable apache2
+
+Finally, we can see if Apache2 is both running and enabled with the following command:
+
+> systemctl status apache2
+
+If it says "enabled" and "running," then everything is good to go with Apache2 at the moment.
+You can also check the EC2 instance's Public IPv4 address in a browser (remember it needs http and not https as it is not yet secure--if you are using Safari or Chrome, it may prevent you from trying to open this address due to it being uncertified.)
+
+===MariaDB===
+Now we install MariaDB, which was developed open-source as a free alternative to MySQL.
+If I'm not mistaken, the Wikimedia projects use MariaDB. First:
+
+> sudo apt install mariadb-server mariadb-client
+
+Check that it is running with:
+
+> systemctl status mariadb
+
+If it is not already set to "enabled" and "running," enter:
+
+> sudo systemctl start mariadb
+> sudo systemctl enable mariadb
+
+Once MariaDB shows "enabled" and "running," it is at an acceptable stage of configuration for our purposes and we can move on to the next installation.
+
+===PHP===
+MediaWiki recommends PHP7.4.
+This means we have to install a bunch of other things. First:
+
+> sudo apt install software-properties-common
+
+The command we want "add-apt-repository" is bugged out of the box as of 11 Sept 2023, so we further to have to run:
+
+> sudo apt install python3-launchpadlib
+
+Which means we can use the command:
+
+> sudo add-apt-repository ppa:ondrej/php
+
+Which will allow us to run the command:
+
+> sudo
