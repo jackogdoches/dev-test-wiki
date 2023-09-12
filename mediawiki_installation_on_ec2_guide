@@ -143,7 +143,7 @@ To do this, open the Elastic IP tab on the left sidebar of the AWS web portal.
 Allocate an Elastic IP and associate it with your EC2 instance on which mediawiki is installed.
 
 Once you have done that, you can set up an A record in the Route 53 DNS Zone that points to the Elastic IP.
-If you want to use a subdomain (e.g., wiki.example.org), Route 53 prompts you to enter one on the new record page.
+If you want to use a subdomain (e.g., wiki.example.net), Route 53 prompts you to enter one on the new record page.
 If you want to use the root domain for the wiki, leave the subdomain prompt blank.
 Route 53 propogates changes to records very quickly, so it shouldn't take long before your domain points to your EC2 instance.
 
@@ -159,16 +159,37 @@ Then we are going to create a new VirtualHost to let Apache2 direct traffic to t
 
 Now copy the following into the nano text editor:
 
-**will add after I can close and reopen Terminal**
+<VirtualHost *:80>
+    ServerAdmin admin@wiki.example.net
+    DocumentRoot /var/www/mediawiki/
+    ServerName wiki.example.net
 
-Make sure to change **relevant details** to the domain you configured earlier.
+    <Directory /var/www/mediawiki/>
+        Options FollowSymLinks
+        AllowOverride All
+        Order allow,deny
+        allow from all
+    </Directory>
+
+    ErrorLog /var/log/apache2/mediawiki_error
+    CustomLog /var/log/apache2/mediawiki_access common
+</VirtualHost>
+
+Make sure to change the domain fields in ServerAdmin and ServerName to the domain you configured earlier.
+Also, if you installed mediawiki anywhere other than /var/www, make sure that you change the DocumentRoot and Directory fields to reflect this.
 
 Now enable site and reload Apache2:
 
 > sudo a2ensite mediawiki.conf
 > sudo systemctl reload apache2
 
-==Set up SSL certificate==
+Apache2 should now be routing you to the Mediawiki configuration and installation page when you enter "wiki.example.net" into your browser.
+But hold off on starting that for one moment; let's encrypt the connection first!
+
+==Set up TLS/SSL certificate==
+A TLS/SSL certificate will stop modern browsers from being scared to connect to your website.
+It will also give you higher search engine results, if you care about SEO for your purposes.
+This part is not strictly necessary, but it's recommended because it's simple and ultimately good for your site.
 We're going to use Certbot from the Electronic Frontiers Foundation because it's free and easy to use with our stack.
 First we need to install snap:
 
