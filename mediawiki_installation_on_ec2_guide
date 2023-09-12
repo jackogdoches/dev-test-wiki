@@ -246,3 +246,30 @@ Once you have done this, you're finished with MariaDB and you can exit it:
 After that, we can finally configure and install Mediawiki itself!
 
 ==Configure and install MediaWiki==
+You're on the home stretch now; open your wiki's domain and you should see Mediawiki prompting you to set it up.
+Simply follow the installation instructions and give it the required information to access the database.
+
+If you want to use extensions and Lua modules on your wiki, I strongly recommend installing all available extensions.
+That is, don't select "I'm bored already, just install mediawiki" and continue to the advanced options.
+
+Once you have finished configuration, you will get a LocalSettings.php file in your downloads.
+Move this file to the same folder as your "key file".pem that you got when you created the EC2 instance.
+
+We'll use secure copy to move the LocalSettings.php to the EC2 instance:
+
+> scp -i "key file".pem LocalSettings.php admin@"EC2 public IPv4 address":~/
+
+Once it's uploaded, ssh back into the EC2 instance.
+If you use "ls" you should see the LocalSettings.php file;
+We want to move it to the mediawiki installation:
+
+> sudo mv LocalSettings.php /var/www/mediawiki
+
+If you installed mediawiki anywhere other than /var/www/mediawiki, remember to reflect this in your command!
+Otherwise, you'll have to re-upload the LocalSetting.php to your EC2 instance.
+
+Once LocalSettings.php has been moved into the mediawiki directory, you're done!
+When you open the wiki's domain, you should see the default Mediawiki home page.
+
+You are now free to edit and configure the wiki to your heart's content.
+I hope this guide has been helpful!
