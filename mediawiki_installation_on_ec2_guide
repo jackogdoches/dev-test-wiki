@@ -133,9 +133,22 @@ In the second case, you should just see a folder named mediawiki.
 Either way, you've successfully downloaded and unpacked MediaWiki 1.39.4!
 
 ==Routing a domain to EC2==
-**will add after I can close and reopen Terminal**
+Before we set up Mediawiki, we'll want to make sure we're using a domain name.
+You can use the IP of the EC2 instance if it's purely for personal use;
+But if you want the broader public to be able to connect easily, it's best to use a domain name.
+I purchased mine through Route 53, but this is not strictly necessary.
+
+Before you can route your domain to the EC2 instance, it needs a stable IP address.
+To do this, open the Elastic IP tab on the left sidebar of the AWS web portal.
+Allocate an Elastic IP and associate it with your EC2 instance on which mediawiki is installed.
+
+Once you have done that, you can set up an A record in the Route 53 DNS Zone that points to the Elastic IP.
+If you want to use a subdomain (e.g., wiki.example.org), Route 53 prompts you to enter one on the new record page.
+If you want to use the root domain for the wiki, leave the subdomain prompt blank.
+Route 53 propogates changes to records very quickly, so it shouldn't take long before your domain points to your EC2 instance.
 
 ==Configuring Apache2 for Mediawiki==
+Once you have routed a domain to the EC2 instance, we need to get Apache2 to direct traffic to the wiki itself.
 First we move into the Apache2 websites directory:
 
 > cd /etc/apache2/sites-available
@@ -185,6 +198,30 @@ Once you provide this, if everything goes well, you should see Certbot say that 
 
 ==Set up MariaDB database==
 The last thing we need to do before we can configure and install Mediawiki is give it a database to store page content in.
-Earlier we installed MariaDB, which is what we'll use for this purpose.
+Earlier we installed MariaDB, which is what we'll use for this purpose:
+
+> sudo mysql -u root
+
+This will open a connection to MariaDB; first we'll create the database:
+
+> CREATE DATABASE examplewiki;
+
+Then we'll create a user for the wiki to access MariaDB through:
+
+> CREATE USER 'wikiuser'@'localhost' IDENTIFIED BY 'password';
+
+Try and be a little more inventine with your password;
+You will need all of these values later on, so make sure they're memorable;
+And also, include the single quote marks.
+Now, we'll give the wiki all privileges over the wiki's database:
+
+> GRANT ALL PRIVILEGES ON examplewiki.* TO 'wikiuser'@'localhost' WITH GRANT OPTION;
+
+Once you have done this, you're finished with MariaDB and you can exit it:
+
+> flush privileges;
+> exit;
+
+After that, we can finally configure and install Mediawiki itself!
 
 ==Configure and install MediaWiki==
