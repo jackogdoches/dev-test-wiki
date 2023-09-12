@@ -131,3 +131,60 @@ Or just:
 In the first case, you should see all of the Mediawiki file folders, .phps, and .jsons;
 In the second case, you should just see a folder named mediawiki.
 Either way, you've successfully downloaded and unpacked MediaWiki 1.39.4!
+
+==Routing a domain to EC2==
+**will add after I can close and reopen Terminal**
+
+==Configuring Apache2 for Mediawiki==
+First we move into the Apache2 websites directory:
+
+> cd /etc/apache2/sites-available
+
+Then we are going to create a new VirtualHost to let Apache2 direct traffic to the wiki:
+
+> sudo nano mediawiki.conf
+
+Now copy the following into the nano text editor:
+
+**will add after I can close and reopen Terminal**
+
+Make sure to change **relevant details** to the domain you configured earlier.
+
+Now enable site and reload Apache2:
+
+> sudo a2ensite mediawiki.conf
+> sudo systemctl reload apache2
+
+==Set up SSL certificate==
+We're going to use Certbot from the Electronic Frontiers Foundation because it's free and easy to use with our stack.
+First we need to install snap:
+
+> sudo apt update
+> sudo apt install snapd
+
+And now we install the snapd core and refresh it to update the package list:
+
+> sudo snap install core
+> sudo snap refresh core
+
+Then we install Certbot itself:
+
+> sudo snap install --clasic certbot
+
+And we link it to allow it to be used from anywhere in the system:
+
+> sudo ln -s /snap/bin/certbot /usr/bin/certbot
+
+Finally, we use certbot to request a TLS/SSL certificate for our website:
+
+> sudo certbot --apache -d wiki.example.net
+
+Of course, replace "wiki.example.net" with whatever domain you configured earlier for Apache2.
+Certbot will ask for an email address where it can send certificate renewal notices;
+Once you provide this, if everything goes well, you should see Certbot say that HTTPS has been enabled.
+
+==Set up MariaDB database==
+The last thing we need to do before we can configure and install Mediawiki is give it a database to store page content in.
+Earlier we installed MariaDB, which is what we'll use for this purpose.
+
+==Configure and install MediaWiki==
