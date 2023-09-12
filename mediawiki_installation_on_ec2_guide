@@ -82,5 +82,52 @@ Before we continue further, make sure we actually installed PHP7.4 by checking t
 
 > php -version
 
-If you see PHP 7.4.33, then you're all set!
-Congratulations, you just installed a full LAMP stack on your EC2 instance.
+If you see PHP 7.4.33, then you've done it;
+yoyu just installed a full LAMP stack on your EC2 instance.
+But we're not quite done yet;
+We need to add a bunch of PHP MediaWiki dependencies:
+
+> sudo apt-get install libapache2-mod-php7.4 php7.4-mysql php-common php7.4-cli php7.4-common php7.4-json php7.4-opcache php7.4-readline php7.4-calendar php7.4-dom php7.4-fileinfo php7.4-intl php7.4-json php7.4-mbstring php7.4-xml php7.4-xmlreader
+
+Finally, we want to make sure that Apache2 is talking to PHP:
+
+> sudo a2enmod php7.4
+
+It might say it's already enabled, which is fine.
+Make sure to restart Apache2 in case it wasn't:
+
+> sudo systemctl restart apache2
+
+Once that is done, we're good to download and unpack MediaWiki!
+
+==Downloading and unpacking MediaWiki==
+First make sure you're in the directory where you want to have your MediaWiki installation folder.
+For me, I put it in /var/www, which is created by Apache2:
+
+> cd /var/www
+
+For the purposes of this guide, I downloaded the most recent Long Term Support version of MediaWiki;
+As of 11 September 2023, this is 1.39.4, which has an end-of-life scheduled for November 2025:
+
+> sudo wget https://releases.wikimedia.org/mediawiki/1.39/mediawiki-1.39.4.tar.gz
+
+Once the download is finished, we need to unpack:
+
+> sudo tar -xzvf mediawiki-1.39.4.tar.gz
+
+Once it's finished unpacking, I like to remove the version number from the folder so it's easier to type:
+
+> sudo mv mediawiki-1.39.4 mediawiki
+
+Check that you did this successfully with either:
+
+> cd mediawiki
+> ls
+
+Or just:
+
+> ls
+
+In the first case, you should see all of the Mediawiki file folders, .phps, and .jsons;
+In the second case, you should just see a folder named mediawiki.
+Either way, you've successfully downloaded and unpacked MediaWiki 1.39.4!
